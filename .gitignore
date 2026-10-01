@@ -3,6 +3,9 @@ dist/
 # generated types
 .astro/
 
+# design exploration / mockups — not part of the production site
+mockups/
+
 # dependencies
 node_modules/
 
