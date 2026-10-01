@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Concept — The Pipeline</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{ --violet:#330867; --sapphire:#0B6A8E; --pacific:#31A7BB; --orange:#FF7A1F; --dim:#2A2E38; }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#0B0E14;font-family:'IBM Plex Sans',sans-serif;color:#E7E9F0;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .head{font-family:'Space Grotesk',sans-serif;}
+  .wrap{max-width:1280px;margin:0 auto;padding:64px 48px;}
+  .intro{max-width:640px;margin-bottom:16px;}
+  .eyebrow{color:var(--pacific); font-size:13px; font-weight:700; letter-spacing:0.06em;}
+  .h1{font-size:32px; font-weight:700; margin:10px 0 12px;}
+  .sub{color:#9AA0B4; font-size:15px; line-height:1.6;}
+  .status{font-size:12px; margin:24px 0 8px; height:16px;}
+  .status .off{color:#5C6070;}
+  .status .on{color:#8CE6B0;}
+
+  .stage{cursor:pointer;}
+  .stage .plate{fill:#12141B; stroke:#23262E; stroke-width:2; transition: all .4s ease;}
+  .stage .icon{stroke:#4A4F5C; transition: stroke .4s ease;}
+  .stage .label{fill:#5C6070; font-family:'JetBrains Mono',monospace; font-size:11px; transition: fill .4s ease;}
+  .stage.active .plate{stroke-width:2.5;}
+  .stage.active .icon{stroke:#0B0E14;}
+  .stage.active .label{fill:#E7E9F0; font-weight:600;}
+
+  .hotspot{cursor:pointer;}
+  .hotspot circle.ring{fill:none; stroke-width:1.5; opacity:0.55;}
+  .hotspot circle.core{transition: fill .3s ease;}
+  .hotspot text{font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; text-anchor:middle; dominant-baseline:central; fill:#0B0E14;}
+  .stage.active .hotspot circle.core{fill:#8CE6B0 !important;}
+
+  .guide{pointer-events:none; transition: transform 1s cubic-bezier(.4,0,.2,1);}
+  .guide circle{fill:none; stroke:var(--orange); stroke-width:2;}
+  .guide .r1{animation: pulse 1.8s ease-out infinite;}
+  .guide .r2{animation: pulse 1.8s ease-out infinite .6s;}
+  @keyframes pulse{ 0%{r:14; opacity:0.9;} 100%{r:34; opacity:0;} }
+
+  .belt-dash{stroke-dasharray:6 10; animation: flow 1.2s linear infinite;}
+  @keyframes flow{ to{ stroke-dashoffset:-32; } }
+  #belt.live .belt-dash{stroke:var(--orange); animation-duration:.5s;}
+
+  .callout{position:absolute; width:230px; background:#12141B; border:1px solid #2A2E38; border-radius:14px; padding:16px 18px; opacity:0; transform:translateY(6px); transition: all .3s ease; pointer-events:none;}
+  .callout.show{opacity:1; transform:translateY(0); pointer-events:auto;}
+  .callout .ct{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:14px; margin-bottom:6px;}
+  .callout .cd{font-size:12px; color:#9AA0B4; line-height:1.5; margin-bottom:10px;}
+  .callout .tags{display:flex; gap:6px; flex-wrap:wrap;}
+  .callout .tag{font-size:10px; font-family:'JetBrains Mono',monospace; padding:3px 8px; border-radius:6px; background:rgba(255,255,255,0.06); color:#B7BDCC;}
+
+  .stage-field{position:relative;}
+  .note{font-size:12px; color:#5C6070; font-style:italic; margin-top:32px; max-width:640px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="intro">
+    <div class="eyebrow mono">CONCEPT — THE PIPELINE</div>
+    <div class="h1 head">One line, six stations, everything I run.</div>
+    <div class="sub">Click any numbered station to bring it online. The glowing marker shows you where to go next — click all six and watch the whole line go live.</div>
+  </div>
+  <div class="status mono"><span id="statusText" class="off">○ pipeline offline — 0/6 stations online</span></div>
+
+  <div class="stage-field" id="field">
+    <svg id="scene" width="100%" viewBox="0 0 1200 340" style="overflow:visible;">
+      <!-- belt -->
+      <line id="belt" x1="90" y1="200" x2="1110" y2="200" stroke="#23262E" stroke-width="3"/>
+      <line class="belt-dash" x1="90" y1="200" x2="1110" y2="200" stroke="#3A3E4A" stroke-width="3"/>
+
+      <!-- moving guide marker -->
+      <g class="guide" id="guide" transform="translate(190,200)">
+        <circle class="r1" r="14"/>
+        <circle class="r2" r="14"/>
+      </g>
+
+      <!-- STATION 1: CODE -->
+      <g class="stage" id="s1" data-i="1" data-x="190">
+        <rect class="plate" x="150" y="140" width="80" height="80" rx="16"/>
+        <g class="icon" transform="translate(170,160)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="0" y="0" width="40" height="30" rx="4"/>
+          <path d="M7 10 L13 15 L7 20 M18 20 H26"/>
+        </g>
+        <text class="label" x="190" y="242" text-anchor="middle">CODE</text>
+        <g class="hotspot"><circle class="ring" cx="190" cy="140" r="14" stroke="#4A4F5C"/><circle class="core" cx="190" cy="140" r="14" fill="#1A1D24"/><text x="190" y="141">1</text></g>
+      </g>
+
+      <!-- STATION 2: BUILD -->
+      <g class="stage" id="s2" data-i="2" data-x="374">
+        <rect class="plate" x="334" y="140" width="80" height="80" rx="16"/>
+        <g class="icon" transform="translate(354,160)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="20" cy="15" r="7"/>
+          <path d="M20 3v4M20 23v4M8 15h4M28 15h4M11.5 6.5l2.8 2.8M25.7 20.7l2.8 2.8M28.5 6.5l-2.8 2.8M14.3 20.7l-2.8 2.8"/>
+        </g>
+        <text class="label" x="374" y="242" text-anchor="middle">BUILD</text>
+        <g class="hotspot"><circle class="ring" cx="374" cy="140" r="14" stroke="#4A4F5C"/><circle class="core" cx="374" cy="140" r="14" fill="#1A1D24"/><text x="374" y="141">2</text></g>
+      </g>
+
+      <!-- STATION 3: SECURE -->
+      <g class="stage" id="s3" data-i="3" data-x="558">
+        <rect class="plate" x="518" y="140" width="80" height="80" rx="16"/>
+        <g class="icon" transform="translate(538,158)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 0 L38 7 V19 C38 29 30 35 20 38 C10 35 2 29 2 19 V7 Z"/>
+          <path d="M13 19 L18 24 L28 13"/>
+        </g>
+        <text class="label" x="558" y="242" text-anchor="middle">SECURE</text>
+        <g class="hotspot"><circle class="ring" cx="558" cy="140" r="14" stroke="#4A4F5C"/><circle class="core" cx="558" cy="140" r="14" fill="#1A1D24"/><text x="558" y="141">3</text></g>
+      </g>
+
+      <!-- STATION 4: GOVERN -->
+      <g class="stage" id="s4" data-i="4" data-x="742">
+        <rect class="plate" x="702" y="140" width="80" height="80" rx="16"/>
+        <g class="icon" transform="translate(722,161)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <ellipse cx="20" cy="4" rx="14" ry="4"/>
+          <path d="M6 4v9c0 2.2 6.3 4 14 4s14-1.8 14-4V4"/>
+          <path d="M6 13v9c0 2.2 6.3 4 14 4s14-1.8 14-4v-9"/>
+        </g>
+        <text class="label" x="742" y="242" text-anchor="middle">GOVERN</text>
+        <g class="hotspot"><circle class="ring" cx="742" cy="140" r="14" stroke="#4A4F5C"/><circle class="core" cx="742" cy="140" r="14" fill="#1A1D24"/><text x="742" y="141">4</text></g>
+      </g>
+
+      <!-- STATION 5: AUTOMATE -->
+      <g class="stage" id="s5" data-i="5" data-x="926">
+        <rect class="plate" x="886" y="140" width="80" height="80" rx="16"/>
+        <g class="icon" transform="translate(906,159)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 0 L23 15 L38 18 L23 21 L20 36 L17 21 L2 18 L17 15 Z" stroke-linejoin="round"/>
+        </g>
+        <text class="label" x="926" y="242" text-anchor="middle">AUTOMATE</text>
+        <g class="hotspot"><circle class="ring" cx="926" cy="140" r="14" stroke="#4A4F5C"/><circle class="core" cx="926" cy="140" r="14" fill="#1A1D24"/><text x="926" y="141">5</text></g>
+      </g>
+
+      <!-- STATION 6: SCALE -->
+      <g class="stage" id="s6" data-i="6" data-x="1110">
+        <rect class="plate" x="1070" y="140" width="80" height="80" rx="16"/>
+        <g class="icon" transform="translate(1088,160)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 26 C3 26 0 22 0 18 C0 13 4 10 8 10 C9 4 15 0 21 2 C26 4 28 8 27 12 C32 12 36 16 36 20 C36 24 32 27 27 27 Z"/>
+          <path d="M18 20v12M13 26l5 6l5-6"/>
+        </g>
+        <text class="label" x="1110" y="242" text-anchor="middle">SCALE</text>
+        <g class="hotspot"><circle class="ring" cx="1110" cy="140" r="14" stroke="#4A4F5C"/><circle class="core" cx="1110" cy="140" r="14" fill="#1A1D24"/><text x="1110" y="141">6</text></g>
+      </g>
+    </svg>
+
+    <div class="callout" id="callout">
+      <div class="ct head" id="cTitle"></div>
+      <div class="cd" id="cDesc"></div>
+      <div class="tags" id="cTags"></div>
+    </div>
+  </div>
+
+  <div class="note">Prototype d'interaction — la position/taille des stations et le style visuel sont volontairement bruts (rectangles + icônes simples) pour tester le mécanisme (marqueur qui guide, activation au clic, callout, ligne qui "s'allume"). L'habillage final (vraie illustration façon plan technique ou ligne d'usine) reste à dessiner si ce mécanisme te convainc.</div>
+</div>
+
+<script>
+  const DATA = {
+    1:{title:"Code", desc:"Where everything starts.", tags:["Python 3"]},
+    2:{title:"Build", desc:"Infrastructure standardized and reproducible.", tags:["Terraform","Docker"]},
+    3:{title:"Secure", desc:"Access controlled, secrets vaulted.", tags:["Vault","RBAC / IAM"]},
+    4:{title:"Govern", desc:"Platforms kept consistent and auditable at scale.", tags:["GitLab","Artifactory"]},
+    5:{title:"Automate", desc:"Security controls that run themselves.", tags:["AI-assisted workflows"]},
+    6:{title:"Scale", desc:"Built to hold 40,000+ users.", tags:["AWS"]},
+  };
+  let active = new Set();
+  const svg = document.getElementById('scene');
+  const guide = document.getElementById('guide');
+  const callout = document.getElementById('callout');
+
+  function positionCallout(i){
+    const stage = document.getElementById('s'+i);
+    const x = parseFloat(stage.dataset.x);
+    const pct = x/1200;
+    const field = document.getElementById('field').getBoundingClientRect();
+    let left = field.width*pct - 115;
+    left = Math.max(8, Math.min(field.width-238, left));
+    callout.style.left = left+'px';
+    callout.style.top = '235px';
+  }
+
+  function showCallout(i){
+    const d = DATA[i];
+    document.getElementById('cTitle').textContent = d.title;
+    document.getElementById('cDesc').textContent = d.desc;
+    document.getElementById('cTags').innerHTML = d.tags.map(t=>'<span class="tag">'+t+'</span>').join('');
+    positionCallout(i);
+    callout.classList.add('show');
+  }
+
+  function moveGuide(){
+    for(let i=1;i<=6;i++){
+      if(!active.has(i)){
+        const x = document.getElementById('s'+i).dataset.x;
+        guide.setAttribute('transform','translate('+x+',200)');
+        guide.style.opacity = 1;
+        return;
+      }
+    }
+    guide.style.opacity = 0;
+  }
+
+  function activate(i){
+    active.add(i);
+    document.getElementById('s'+i).classList.add('active');
+    showCallout(i);
+    moveGuide();
+    const n = active.size;
+    const statusEl = document.getElementById('statusText');
+    if(n<6){
+      statusEl.className = 'off';
+      statusEl.textContent = '○ pipeline offline — '+n+'/6 stations online';
+    } else {
+      statusEl.className = 'on';
+      statusEl.textContent = '● pipeline operational — 6/6 stations online';
+      document.getElementById('belt').parentElement.querySelector('.belt-dash') || null;
+      document.getElementById('scene').querySelector('.belt-dash').closest('svg');
+      document.getElementById('scene').classList.add('live');
+      document.querySelector('.belt-dash').style.stroke = '#FF7A1F';
+      document.querySelector('.belt-dash').style.animationDuration = '.5s';
+    }
+  }
+
+  for(let i=1;i<=6;i++){
+    document.getElementById('s'+i).addEventListener('click', ()=>activate(i));
+  }
+  moveGuide();
+</script>
+</body>
+</html>

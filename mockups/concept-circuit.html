@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Concept — Live Circuit</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{ --orange:#FF7A1F; --pacific:#31A7BB; --violet:#330867; --green:#4ADE80; }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#080A0F;font-family:'IBM Plex Sans',sans-serif;color:#E7E9F0;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .head{font-family:'Space Grotesk',sans-serif;}
+  .wrap{max-width:1280px;margin:0 auto;padding:64px 48px;}
+  .intro{max-width:680px;margin-bottom:16px;}
+  .eyebrow{color:var(--green); font-size:13px; font-weight:700; letter-spacing:0.06em;}
+  .h1{font-size:32px; font-weight:700; margin:10px 0 12px;}
+  .sub{color:#9AA0B4; font-size:15px; line-height:1.6;}
+  .status{font-size:12px; margin:20px 0 24px;}
+  .status .off{color:#5C6070;}
+  .status .on{color:var(--green);}
+
+  .board{position:relative; height:460px; border:1px solid #16181F; border-radius:20px; background:#0B0D13; overflow:hidden;}
+  .board-tex{position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px); background-size:24px 24px;}
+
+  .trace{fill:none; stroke:#1E222C; stroke-width:3;}
+  .trace-glow{fill:none; stroke:var(--pacific); stroke-width:3; stroke-dasharray:8 500; stroke-dashoffset:500; opacity:0; filter: drop-shadow(0 0 4px var(--pacific));}
+  .trace-glow.run{opacity:1; animation: travel 1s linear forwards;}
+  @keyframes travel{ 0%{stroke-dashoffset:500;} 100%{stroke-dashoffset:0;} }
+
+  .chip{position:absolute; left:50%; top:50%; width:96px; height:96px; margin:-48px; border-radius:14px; background:#12141B; border:2px solid #23262E; display:flex; align-items:center; justify-content:center; transition: all .4s ease;}
+  .chip.on{border-color:var(--green); box-shadow:0 0 30px -4px rgba(74,222,128,0.6);}
+  .chip .core{width:40px;height:40px;border-radius:8px;background:#1A1D26; transition:all .4s ease;}
+  .chip.on .core{background:var(--green); box-shadow:0 0 16px rgba(74,222,128,0.8);}
+
+  .node{position:absolute; width:32px; height:32px; cursor:pointer;}
+  .node .ring{position:absolute; inset:0; border-radius:50%; border:1.5px solid var(--orange); opacity:0;}
+  .node.guide .ring{animation:pulse 1.6s ease-out infinite;}
+  @keyframes pulse{ 0%{transform:scale(0.6); opacity:0.9;} 100%{transform:scale(2.4); opacity:0;} }
+  .node .core{position:absolute; inset:5px; border-radius:50%; background:#12141B; border:1.5px solid #3A3E4A; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:11px; color:#8892A9; transition:all .3s ease;}
+  .node.done .core{background:var(--pacific); border-color:var(--pacific); color:#07100B;}
+
+  #nodeA{ left:12%; top:20%; }
+  #nodeB{ left:80%; top:16%; }
+  #nodeC{ left:14%; top:76%; }
+  #nodeD{ left:82%; top:78%; }
+
+  .callout{position:absolute; width:230px; background:rgba(10,12,20,0.94); border:1px solid var(--pacific); border-radius:10px; padding:14px 16px; opacity:0; transform:scale(.96); transition:all .3s ease; pointer-events:none; z-index:6;}
+  .callout.show{opacity:1; transform:scale(1);}
+  .callout .ct{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--pacific); font-weight:700; margin-bottom:6px;}
+  .callout .cd{font-size:12.5px; color:#D5D8E0; line-height:1.5; margin-bottom:8px;}
+  .callout .tags{display:flex; gap:6px; flex-wrap:wrap;}
+  .callout .tag{font-size:10px; font-family:'JetBrains Mono',monospace; padding:3px 8px; border-radius:6px; background:rgba(255,255,255,0.07); color:#B7BDCC;}
+
+  .note{font-size:12px; color:#5C6070; font-style:italic; margin-top:32px; max-width:680px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="intro">
+    <div class="eyebrow mono">CONCEPT — LIVE CIRCUIT</div>
+    <div class="h1 head">Power the board, one node at a time.</div>
+    <div class="sub">Click a node — a pulse of light travels the trace to the chip. Power all four and the chip comes alive.</div>
+  </div>
+  <div class="status mono"><span id="statusText" class="off">○ chip unpowered — 0/4 nodes connected</span></div>
+
+  <div class="board" id="board">
+    <div class="board-tex"></div>
+    <svg width="100%" height="100%" viewBox="0 0 1000 460" style="position:absolute; inset:0;">
+      <path id="pA" class="trace" d="M 120 92 C 300 92, 350 230, 500 230"/>
+      <path id="gA" class="trace-glow" d="M 120 92 C 300 92, 350 230, 500 230"/>
+      <path id="pB" class="trace" d="M 800 74 C 620 74, 580 230, 500 230"/>
+      <path id="gB" class="trace-glow" d="M 800 74 C 620 74, 580 230, 500 230"/>
+      <path id="pC" class="trace" d="M 140 350 C 300 350, 360 260, 500 230"/>
+      <path id="gC" class="trace-glow" d="M 140 350 C 300 350, 360 260, 500 230"/>
+      <path id="pD" class="trace" d="M 820 360 C 640 360, 600 260, 500 230"/>
+      <path id="gD" class="trace-glow" d="M 820 360 C 640 360, 600 260, 500 230"/>
+    </svg>
+
+    <div class="chip" id="chip"><div class="core"></div></div>
+
+    <div class="node guide" id="nodeA" data-key="A"><div class="ring"></div><div class="core">1</div></div>
+    <div class="node" id="nodeB" data-key="B"><div class="ring"></div><div class="core">2</div></div>
+    <div class="node" id="nodeC" data-key="C"><div class="ring"></div><div class="core">3</div></div>
+    <div class="node" id="nodeD" data-key="D"><div class="ring"></div><div class="core">4</div></div>
+
+    <div class="callout" id="callout"><div class="ct" id="cTitle"></div><div class="cd" id="cDesc"></div><div class="tags" id="cTags"></div></div>
+  </div>
+
+  <div class="note">Prototype d'interaction — identité "hardware/ingénieur", impulsion lumineuse qui voyage le long des pistes jusqu'à la puce centrale. Le style (vraie texture de circuit imprimé) reste à raffiner si le concept te convainc.</div>
+</div>
+
+<script>
+  const DATA = {
+    A:{title:"NODE 01 — GOVERNANCE", desc:"Developer platforms kept consistent and auditable.", tags:["GitLab","Artifactory"]},
+    B:{title:"NODE 02 — BUILD", desc:"Infrastructure standardized and reproducible.", tags:["Terraform","Docker","AWS"]},
+    C:{title:"NODE 03 — ACCESS", desc:"Identity and secrets, controlled at every layer.", tags:["RBAC / IAM","Vault"]},
+    D:{title:"NODE 04 — AUTOMATION", desc:"Security controls that run themselves.", tags:["AI-assisted workflows","Python 3"]},
+  };
+  const order = ["A","B","C","D"];
+  let on = new Set();
+  const callout = document.getElementById('board');
+
+  function position(el){
+    const r = el.getBoundingClientRect();
+    const b = document.getElementById('board').getBoundingClientRect();
+    let left = (r.left-b.left) + 38;
+    let top = (r.top-b.top) - 6;
+    if(left+230 > b.width) left = (r.left-b.left) - 246;
+    if(top+100 > b.height) top = b.height-108;
+    if(top<8) top = 8;
+    const c = document.getElementById('callout');
+    c.style.left = left+'px'; c.style.top = top+'px';
+  }
+
+  function power(key, el){
+    document.getElementById('g'+key).classList.remove('run'); void document.getElementById('g'+key).offsetWidth;
+    document.getElementById('g'+key).classList.add('run');
+    on.add(key);
+    el.classList.add('done');
+    const d = DATA[key];
+    document.getElementById('cTitle').textContent = d.title;
+    document.getElementById('cDesc').textContent = d.desc;
+    document.getElementById('cTags').innerHTML = d.tags.map(t=>'<span class="tag">'+t+'</span>').join('');
+    position(el);
+    document.getElementById('callout').classList.add('show');
+
+    document.querySelectorAll('.node').forEach(n=>n.classList.remove('guide'));
+    const next = order.find(k=>!on.has(k));
+    if(next) document.getElementById('node'+next).classList.add('guide');
+
+    const n = on.size;
+    const s = document.getElementById('statusText');
+    if(n<4){ s.className='off'; s.textContent = '○ chip unpowered — '+n+'/4 nodes connected'; }
+    else {
+      s.className='on'; s.textContent = '● chip powered — 4/4 nodes connected';
+      setTimeout(()=>document.getElementById('chip').classList.add('on'), 500);
+    }
+  }
+
+  order.forEach(k=>document.getElementById('node'+k).addEventListener('click', function(){ power(k, this); }));
+</script>
+</body>
+</html>
