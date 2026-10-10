@@ -6,15 +6,18 @@ import { projects } from "../data/projects";
     <div class="sec-title">A few things I've built</div>
     <div class="project-list">
       {projects.map((project, i) => (
-        <div
-          class="project-row"
-          data-project-index={i}
-          role="button"
-          tabindex="0"
-          aria-label={`View screenshots of ${project.title}`}
-        >
+        <div class="project-row">
           <div class="project-shot">
-            <img src={`${import.meta.env.BASE_URL}${project.cover.slice(1)}`} alt={`${project.title} screenshot`} />
+            <button
+              type="button"
+              class="project-shot-btn"
+              data-project-index={i}
+              aria-label={`View screenshots of ${project.title}`}
+            >
+              <span class="project-frame">
+                <img src={`${import.meta.env.BASE_URL}${project.cover.slice(1)}`} alt={`${project.title} screenshot`} />
+              </span>
+            </button>
           </div>
           <div>
             <div class="project-idx">{String(i + 1).padStart(2, "0")}</div>

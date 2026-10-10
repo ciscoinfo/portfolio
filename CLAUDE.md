@@ -45,8 +45,8 @@ The project gallery is one shared modal (`ProjectModal.astro`): every element wi
 - Palette (tokens in `:root`): violet `#330867`, sapphire `#0B6A8E`, pacific `#31A7BB`, orange `#FF7A1F` / light `#FFB27A`, ink/dark `#1A1A22`, page `#FBFAF7`, tint `#EFF3F6`.
 - **Section rhythm (do not break):** gradient hero → dark track record → light about → tint skills → light projects → dark footer. Adjacent sections must never share the same flat background. All sections are flat rectangles (no diagonals).
 - Full-bleed sections with one `.wrap` container (max 1440px, side padding 96 → 48 → 20px).
-- Projects: alternating rows (screenshot on one side, text on the other), no gray frame around screenshots, no overlays or badges on images, whole row clickable. Generous spacing was a deliberate choice; do not tighten it.
-- Skills: numbered minimalist rows with a scroll-reveal animation; accent line colors per row.
+- Projects: alternating rows (screenshot on one side, text on the other), no overlays or badges on images. Each screenshot has a thin brand-gradient border (about 7px, violet to sapphire to pacific, hugging the image, no empty side bands) so white screenshots stand out from the cream background; the owner found a 22px frame far too heavy, keep it subtle. **Only the screenshot (a real `<button>`) opens the gallery**; the rest of the row is not clickable (the owner found a whole-row click target too broad). Generous spacing was a deliberate choice; do not tighten it.
+- Skills: numbered minimalist rows with a scroll-reveal animation and accent line colors per row. Each row has two levels: title on the left; on the right a readable description (16px, dark gray, never tiny/light gray) with the tags on their own line below it. Roomy padding (the owner found the earlier one-line layout too dense).
 
 ## Content rules (public repo and public site)
 
@@ -83,6 +83,7 @@ The owner is not comfortable with the tooling and will not maintain the code him
 
 - The site is served under a sub-path: `astro.config.mjs` sets `site: 'https://ciscoinfo.github.io'` and `base: '/portfolio/'`. Locally the site is at **http://localhost:4321/portfolio/** (the trailing slash is required; without it Astro answers 404).
 - Never hardcode root-absolute asset URLs in markup. Use `import.meta.env.BASE_URL` (see `Hero.astro`, `Projects.astro`, `ProjectModal.astro`); data files keep `/images/...` and the components prepend the base.
+- The dev server logs `[ERROR] [router] Request URLs for public/ assets must also include your base ... "/favicon.ico"` when a browser tab sits on `http://localhost:4321/` (the root, which is a 404 page with no icon links, so the browser probes `/favicon.ico`). It is harmless dev-only noise, absent at `http://localhost:4321/portfolio/`; attempts to intercept it with Vite/Astro middleware did not work (Astro rejects the URL first). Do not add hacks for it.
 - Skill rows reveal via `IntersectionObserver`; in the automated browser pane this can lag, which is a rendering artifact, not a bug.
 - Windows/automated-browser quirks: screenshots sometimes time out or render blank after scrolling; retry or open a fresh tab.
 

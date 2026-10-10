@@ -87,13 +87,6 @@ const galleryData = projects.map((p) => ({ title: p.title, images: p.images }));
 
   document.querySelectorAll("[data-project-index]").forEach((el) => {
     el.addEventListener("click", () => open(Number((el as HTMLElement).dataset.projectIndex)));
-    el.addEventListener("keydown", (e) => {
-      const key = (e as KeyboardEvent).key;
-      if (key === "Enter" || key === " ") {
-        e.preventDefault();
-        open(Number((el as HTMLElement).dataset.projectIndex));
-      }
-    });
   });
 
   modal?.querySelectorAll("[data-close]").forEach((el) => el.addEventListener("click", close));
