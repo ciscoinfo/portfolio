@@ -2,7 +2,7 @@
 
 Personal portfolio site — Platform DevSecOps Engineer. Built with [Astro](https://astro.build), deployed as a static site.
 
-🔗 Live site: _coming soon (GitHub Pages deployment in progress)_
+🔗 Live site: [ciscoinfo.github.io/portfolio](https://ciscoinfo.github.io/portfolio/)
 
 ## Stack
 
@@ -14,7 +14,7 @@ Personal portfolio site — Platform DevSecOps Engineer. Built with [Astro](http
 
 ```bash
 npm install
-npm run dev       # http://localhost:4321
+npm run dev       # http://localhost:4321/portfolio/
 ```
 
 Other commands:
