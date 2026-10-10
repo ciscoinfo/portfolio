@@ -1,0 +1,109 @@
+---
+import { projects } from "../data/projects";
+
+const galleryData = projects.map((p) => ({ title: p.title, images: p.images }));
+---
+<div id="project-modal" class="project-modal" aria-hidden="true">
+  <div class="project-modal-backdrop" data-close></div>
+  <div class="project-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="project-modal-title">
+    <button type="button" class="project-modal-close" data-close aria-label="Close gallery">✕</button>
+    <div class="project-modal-image-wrap">
+      <button type="button" class="project-modal-nav project-modal-prev" aria-label="Previous screenshot">‹</button>
+      <img id="project-modal-image" src="" alt="" />
+      <button type="button" class="project-modal-nav project-modal-next" aria-label="Next screenshot">›</button>
+    </div>
+    <div class="project-modal-meta">
+      <span id="project-modal-title" class="project-modal-title"></span>
+      <span id="project-modal-counter" class="project-modal-counter"></span>
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="project-gallery-data" set:html={JSON.stringify(galleryData)} />
+
+<script>
+  const base = import.meta.env.BASE_URL;
+  const dataEl = document.getElementById("project-gallery-data");
+  const galleryData = dataEl ? JSON.parse(dataEl.textContent ?? "[]") : [];
+
+  const modal = document.getElementById("project-modal");
+  const imageEl = document.getElementById("project-modal-image") as HTMLImageElement;
+  const titleEl = document.getElementById("project-modal-title");
+  const counterEl = document.getElementById("project-modal-counter");
+  const prevBtn = modal?.querySelector(".project-modal-prev") as HTMLButtonElement;
+  const nextBtn = modal?.querySelector(".project-modal-next") as HTMLButtonElement;
+
+  let currentProject: { title: string; images: string[] } | null = null;
+  let currentIndex = 0;
+  let lastFocused: HTMLElement | null = null;
+
+  function toUrl(path: string) {
+    return base + path.replace(/^\//, "");
+  }
+
+  function render() {
+    if (!currentProject || !imageEl || !titleEl || !counterEl) return;
+    imageEl.src = toUrl(currentProject.images[currentIndex]);
+    imageEl.alt = `${currentProject.title} screenshot ${currentIndex + 1}`;
+    titleEl.textContent = currentProject.title;
+    const multiple = currentProject.images.length > 1;
+    counterEl.textContent = multiple ? `${currentIndex + 1} / ${currentProject.images.length}` : "";
+    if (prevBtn) prevBtn.hidden = !multiple;
+    if (nextBtn) nextBtn.hidden = !multiple;
+  }
+
+  function open(projectIndex: number) {
+    currentProject = galleryData[projectIndex];
+    currentIndex = 0;
+    if (!currentProject || !modal) return;
+    render();
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden", "false");
+    lastFocused = document.activeElement as HTMLElement;
+    document.body.style.overflow = "hidden";
+    (modal.querySelector(".project-modal-close") as HTMLElement)?.focus();
+  }
+
+  function close() {
+    if (!modal) return;
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+    currentProject = null;
+    lastFocused?.focus();
+  }
+
+  function showPrev() {
+    if (!currentProject) return;
+    currentIndex = (currentIndex - 1 + currentProject.images.length) % currentProject.images.length;
+    render();
+  }
+
+  function showNext() {
+    if (!currentProject) return;
+    currentIndex = (currentIndex + 1) % currentProject.images.length;
+    render();
+  }
+
+  document.querySelectorAll("[data-project-index]").forEach((el) => {
+    el.addEventListener("click", () => open(Number((el as HTMLElement).dataset.projectIndex)));
+    el.addEventListener("keydown", (e) => {
+      const key = (e as KeyboardEvent).key;
+      if (key === "Enter" || key === " ") {
+        e.preventDefault();
+        open(Number((el as HTMLElement).dataset.projectIndex));
+      }
+    });
+  });
+
+  modal?.querySelectorAll("[data-close]").forEach((el) => el.addEventListener("click", close));
+  prevBtn?.addEventListener("click", showPrev);
+  nextBtn?.addEventListener("click", showNext);
+
+  document.addEventListener("keydown", (e) => {
+    if (!modal?.classList.contains("is-open")) return;
+    if (e.key === "Escape") close();
+    if (e.key === "ArrowLeft") showPrev();
+    if (e.key === "ArrowRight") showNext();
+  });
+</script>

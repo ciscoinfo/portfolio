@@ -1,0 +1,34 @@
+---
+import { skills } from "../data/skills";
+---
+<div id="skills-section" style="position:relative; background:#EFF3F6; scroll-margin-top:24px;">
+  <div class="wrap" style="padding-top:88px; padding-bottom:88px;">
+    <div class="sec-title">What I bring to a team</div>
+    <div style="margin-top:40px;" id="skillList">
+      {skills.map((skill, i) => (
+        <div class="skill-row">
+          <div class="skill-idx">{String(i + 1).padStart(2, "0")}</div>
+          <div class="skill-name">{skill.title}</div>
+          <div class="skill-desc">{skill.description}</div>
+          <div class="skill-tags">
+            {skill.tags.map((tag) => <span class="pr-tag-outline">{tag}</span>)}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+<script>
+  const rows = document.querySelectorAll('.skill-row');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const idx = Array.from(rows).indexOf(entry.target);
+        setTimeout(() => entry.target.classList.add('in'), idx * 220);
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  rows.forEach((r) => io.observe(r));
+</script>

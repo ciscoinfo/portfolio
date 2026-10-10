@@ -1,0 +1,27 @@
+---
+import { stats, highlights } from "../data/trackRecord";
+---
+<div style="position:relative; background:#1A1A22;">
+  <div class="wrap" style="padding-top:88px; padding-bottom:88px;">
+    <div class="sec-title" style="color:#fff;">Track record</div>
+    <div style="font-size:17px; color:#C7C7D1; max-width:640px; line-height:1.6; margin-top:24px; margin-bottom:40px;">
+      Real results, from real production environments.
+    </div>
+    <div class="stat-grid">
+      {stats.map((stat) => (
+        <div>
+          <div style={`font-family:var(--font-display); font-weight:700; font-size:32px; color:${stat.color};`}>{stat.value}</div>
+          <div style="font-size:13px; color:#C7C7D1; margin-top:6px; line-height:1.55;">{stat.label}</div>
+        </div>
+      ))}
+    </div>
+    <div class="highlight-grid">
+      {highlights.map((item) => (
+        <div class="highlight" style={`border-top-color:${item.accent};`}>
+          <div class="highlight-title">{item.title}</div>
+          <div class="highlight-text">{item.description}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
